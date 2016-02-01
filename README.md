@@ -5,7 +5,7 @@ Radio's website: www.rtl.it, and Wikipedia entry: https://en.wikipedia.org/wiki/
 
 ## How to use
 * Run `stream http://shoutcast.rtl.it:3010/stream/1/` using VLC.
-* Open terminal and run `python vlc_DAB_info.py`.
+* Open terminal and run `python rtl1025-playlist.py`.
 * Example output:
 ```
 $ python rtl1025-playlist.py 
