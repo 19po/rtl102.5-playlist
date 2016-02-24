@@ -1,9 +1,11 @@
 # rtl102.5-playlist
 RTL 102.5 (private Italian radio station) on-the-air playlist parser for VLC.
-
 Radio's website: www.rtl.it, and Wikipedia entry: https://en.wikipedia.org/wiki/RTL_102.5
 
-## How to use
+## How to use (v. 2)
+Open terminal and run `python Main.py`. VLC with radio stream will be launched.
+
+## How to use (v. 1)
 * Run stream `http://shoutcast.rtl.it:3010/stream/1/` using VLC.
 * Open terminal and run `python rtl1025-playlist.py`.
 * Example output:
