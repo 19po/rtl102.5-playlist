@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore
 import urllib
 from xml.dom.minidom import parse
 import re
@@ -8,10 +8,15 @@ import os
 
 __author__ = 'postrowski'
 
+
 # -*-coding: utf-8-*-
 
 
 class RunVlcThread(QtCore.QThread):
+    """
+        Class RunVlcThread which run cVLC in separate thread if VLC is closed.
+    """
+
     def __init__(self):
         QtCore.QThread.__init__(self)
 
@@ -24,6 +29,10 @@ class RunVlcThread(QtCore.QThread):
 
 
 class Playlist(object):
+    """
+        Class Playlist which get information and show it.
+    """
+
     def __init__(self, parent):
         self.nowPlayingLabel = parent.nowPlayingLabel
         self.programLabel = parent.programLabel
@@ -35,99 +44,149 @@ class Playlist(object):
         self.central_widget = parent.central_widget
         self.hide_ui = parent.hide_ui
         self.show_ui = parent.show_ui
+        self.logoLabel = parent.logoLabel
 
     def show_info(self, data):
+        """
+            Print information in UI.
+        :param data: json file
+        :return: None
+        """
         # get info from json file
-        artist_song, song_cover, program_speakers, program_image = '', '', '', ''
+        song_cover, artist_song, program_speakers, program_image = '', '', '', ''
         try:
-            artist_song = data["artist_name"] + '\n' + data["song_title"]
             song_cover = data["song_cover"]
+            artist_song = data["artist_name"] + '\n' + data["song_title"]
             program_speakers = data["program_title"] + '\n' + data["speakers"]
             program_image = data["program_image"]
         except TypeError:
             pass
 
-        # show (dictionary value exists) or hide (dictionary value empty) widget
+        # display data
+        if song_cover:
+            self.logoLabel.hide()
+            self.coverWebView.show()
+            self.coverWebView.load(QtCore.QUrl(song_cover))
+        else:
+            self.coverWebView.hide()
+            self.logoLabel.show()
 
-        # artist name, song title
         if artist_song:
+            self.nowPlayingLabel.show()
             self.nowPlayingLabel.setText(artist_song)
         else:
             self.nowPlayingLabel.hide()
 
-        # song cover
-        # if song_cover:
-        #     self.coverWebView.load(QtCore.QUrl(song_cover))
-        # else:
-        #     self.coverWebView.hide()
-        self.coverWebView.load(QtCore.QUrl(song_cover))
-
-        # program title, speakers
         if program_speakers:
+            self.programLabel.show()
             self.programLabel.setText(program_speakers)
         else:
             self.programLabel.hide()
 
-        # program image
         if program_image:
+            self.programWebView.show()
             self.programWebView.load(QtCore.QUrl(program_image))
         else:
             self.programWebView.hide()
 
-        # # display data
         for k, v in data.items():
             print("{:15}{:2}{:1}".format(k, ":", v.encode('utf-8')))
 
-    def json_change(self):
+    def show_msg(self):
         """
-            Check json file.
+            Show UI per 20 seconds. Resize central widget.
+        :return: None
         """
-        self.hide_ui()
+        with open('/tmp/rtl1025-playlist-2.json', 'r') as f:
+            data = json.load(f)
+        self.show_info(data)
+        self.show_ui()
+        self.central_widget.show()
 
-        # get current information (1) and make json file
-        write_info_1()
-        with open('/tmp/rtl1025-playlist-1.json', 'r') as f1:
-            old_data = json.load(f1)
+        # resize central widget; not smaller than fixed size
+        size = self.central_widget.size()
+        new_size = self.central_widget.sizeHint()
+        if self.central_widget.resize(self.central_widget.sizeHint()) > size:
+            self.central_widget.resize(new_size)
+        elif self.central_widget.resize(self.central_widget.sizeHint()) < size:
+            self.central_widget.resize(size)
 
-        # wait 10 seconds
-        sleep(10)
+        self.timer.start(20000)  # 20 seconds, display ui time in ms
 
-        # get current information (2) and make json file
-        write_info_2()
-        with open('/tmp/rtl1025-playlist-2.json', 'r') as f2:
-            data = json.load(f2)
-
-        # compare information (1) and information (2)
-        # if json values was changed show ui with information
+    def cmp_json(self, j1, j2):
+        """
+            Compare two json files and show message if they are different.
+        :param j1: first json file
+        :param j2: second json file
+        :return: None
+        """
         try:
-            if bool(cmp(old_data.values(), data.values())):
-                # print('new')
-                self.show_info(data)
-                self.show_ui()
-                self.central_widget.show()
-                self.timer.start(20000)  # 20 seconds, display ui time in ms
-            else:
-                # print('old')
-                self.hide_ui()
+            with open(j1, 'r') as f1, open(j2, 'r') as f2:
+                d1 = json.load(f1)
+                d2 = json.load(f2)
+                if bool(cmp(d1, d2)):
+                    self.show_msg()
+                else:
+                    self.hide_ui()
         except AttributeError:
             pass
 
+    def json_change(self):
+        """
+            Check is  information from VLC status.xml file and compare them.
+        :return: None
+        """
+        self.hide_ui()
+
+        if os.path.exists('/tmp/rtl1025-playlist-2.json'):
+            # get current information (1) and make json file
+            print "1111"
+            write_info_1()  # create 'rtl1025-playlist-1.json' file
+            sleep(10)  # wait 10 seconds
+            write_info_2()  # create 'rtl1025-playlist-2.json' file
+            # compare two previous created json
+            self.cmp_json('/tmp/rtl1025-playlist-1.json', '/tmp/rtl1025-playlist-2.json')
+        else:
+            print "0000"
+            write_info_2()  # create 'rtl1025-playlist-2.json' file
+            self.show_msg()  # show message
+
+    @staticmethod
+    def remove_file():
+        """
+            Remove 'rtl1025-playlist-2.json' file if application was launched next time before restart system.
+        :return: None
+        """
+        f = '/tmp/rtl1025-playlist-2.json'
+        if os.path.exists(f):
+            os.remove(f)
+
 
 def get_status(in_file, out_file):
-    # check if VLC is turned on; get generated by VLC status.xml file
+    """
+        Check if VLC is turned on and get generated by VLC status.xml file.
+    :param in_file: VLC status.xml
+    :param out_file: downloaded VLC status.xml as info.xml
+    :return: None
+    """
     try:
         urllib.urlretrieve(in_file, out_file)
     except IOError:
-        # VLC is turned off; run VLC in separate thread
+        # VLC is turned off; run cVLC in separate thread
         run_vlc = RunVlcThread()
         run_vlc.start()
-        # wait 10 seconds, and get generated by VLC status.xml file
-        sleep(10)
+        # wait 5 seconds (time needed to start cVLC); get generated by VLC status.xml file
+        sleep(5)
         urllib.urlretrieve(in_file, out_file)
 
 
 def replace_html(in_file, out_file):
-    # replace html characters with xml
+    """
+        Replace html characters with xml.
+    :param in_file: downloaded VLC status.xml as info.xml
+    :param out_file: info-x.xml without html characters
+    :return: None
+    """
     with open(in_file, 'r') as fr, open(out_file, 'w') as fw:
         z = ['&lt;', '&gt;']
         x = ['<', '>']
@@ -140,7 +199,7 @@ def replace_html(in_file, out_file):
 
 def uni(s):
     """
-    Decode text.
+        Decode text downloaded from VLC status.xml.
     :param s: input string
     """
     ascii_char = re.findall(r'\[e\]\[c\](\d+)\[p\]', s)
@@ -160,7 +219,11 @@ def uni(s):
 
 
 def get_xml_data(in_file):
-    # open xml file, get information and make json file
+    """
+        Open VLC status.xml file file and get information and make json file.
+    :param in_file: info-x.xml without html characters
+    :return: dictionary with current information
+    """
     with open(in_file, 'r') as fr:
         dom = parse(fr)
         node = dom.childNodes
@@ -176,7 +239,6 @@ def get_xml_data(in_file):
             info_dict["artist_name"] = uni(node[0].getElementsByTagName('mus_art_name')[0].firstChild.data)
             info_dict["song_title"] = uni(node[0].getElementsByTagName('mus_sng_title')[0].firstChild.data)
             info_dict["song_cover"] = node[0].getElementsByTagName('mus_sng_itunescoverbig')[0].firstChild.data
-
         except (IndexError, AttributeError):
             pass
 
@@ -184,6 +246,10 @@ def get_xml_data(in_file):
 
 
 def write_info_1():
+    """
+        Get VLC status.xml file and create json file.
+    :return: None
+    """
     get_status('http://127.0.0.1:8080/requests/status.xml', '/tmp/info.xml')
     replace_html('/tmp/info.xml', '/tmp/info-1.xml')
 
@@ -192,6 +258,10 @@ def write_info_1():
 
 
 def write_info_2():
+    """
+        Get VLC status.xml file and create json file.
+    :return: None
+    """
     get_status('http://127.0.0.1:8080/requests/status.xml', '/tmp/info.xml')
     replace_html('/tmp/info.xml', '/tmp/info-2.xml')
 
