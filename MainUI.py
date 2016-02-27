@@ -68,6 +68,8 @@ class MainUI(QtGui.QMainWindow, Playlist):
         self.logoLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.logoLabel.hide()
 
+        dock = QtGui.QDockWidget()
+
         # layout
 
         self.central_widget.setStyleSheet(
@@ -87,12 +89,15 @@ class MainUI(QtGui.QMainWindow, Playlist):
         self.central_widget.setLayout(grid)
         grid.setAlignment(self, QtCore.Qt.AlignRight)
 
+        self.setDockNestingEnabled(True)
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, dock)
+
         self.setCentralWidget(self.central_widget)
         self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.SplashScreen)
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
-        self.setGeometry(self.width() * 2, self.height() / 2 - 150, 400, 150)
+        self.setGeometry(self.width() * 2 - 150, self.height() / 2 - 150, 400, 150)
 
     def mouseDoubleClickEvent(self, event):
         """
