@@ -1,5 +1,8 @@
 from PyQt4 import QtGui, QtCore, QtWebKit
 from Playlist import Playlist
+from SystemTray import SystemTray
+import icon
+from time import sleep
 
 __author__ = 'postrowski'
 
@@ -21,6 +24,9 @@ class MainUI(QtGui.QMainWindow, Playlist):
         self.programLabel = QtGui.QLabel()
         self.nowPlayingLabel = QtGui.QLabel()
         self.logoLabel = QtGui.QLabel()
+        self.tray_menu = QtGui.QMenu()
+        self.tray_icon = QtGui.QSystemTrayIcon()
+        self.process_vlc = QtCore.QProcess()
 
         # setup UI
         self.setup_ui()
@@ -34,6 +40,9 @@ class MainUI(QtGui.QMainWindow, Playlist):
         # remove file
         p = Playlist(self)
         p.remove_file()
+
+        # System Tray Icon
+        SystemTray(self)
 
     def setup_ui(self):
         """
@@ -62,13 +71,12 @@ class MainUI(QtGui.QMainWindow, Playlist):
 
         self.timer.start(30)  # timer initial state
 
-        pixmap = QtGui.QPixmap("RTL_102.5_(logo).png")
+        pixmap = QtGui.QPixmap(":/images/icon.png")
         self.logoLabel.setPixmap(pixmap)
         self.logoLabel.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.logoLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.logoLabel.setFixedSize(self.coverWebView.width(), self.coverWebView.height())
         self.logoLabel.hide()
-
-        dock = QtGui.QDockWidget()
 
         # layout
 
@@ -89,15 +97,15 @@ class MainUI(QtGui.QMainWindow, Playlist):
         self.central_widget.setLayout(grid)
         grid.setAlignment(self, QtCore.Qt.AlignRight)
 
-        self.setDockNestingEnabled(True)
-        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, dock)
-
         self.setCentralWidget(self.central_widget)
         self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.SplashScreen)
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
-        self.setGeometry(self.width() * 2 - 150, self.height() / 2 - 150, 400, 150)
+        self.setGeometry(self.width() * 2, self.height() / 2 - 150, 400, 150)
+
+        self.process_vlc.start("cvlc --extraintf=http http://shoutcast.rtl.it:3010/stream/1/")
+        sleep(5)  # wait 5 seconds (time needed to start cVLC)
 
     def mouseDoubleClickEvent(self, event):
         """

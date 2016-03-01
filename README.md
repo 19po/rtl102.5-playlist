@@ -12,17 +12,23 @@ Create application launcher:
     [Desktop Entry]
     Version=2.0
     Type=Application
-    Terminal=true
+    Terminal=false
     Exec=python <your-path>/rtl102.5-playlist/Main.py
     Name=RTL 102.5 Playlist
     Comment=RTL 102.5 plugin
-    Icon=<your-path>/rtl102.5-playlist/RTL_102.5_(logo).png
+    Icon=<your-path>/rtl102.5-playlist/icon.png
     ```
-
 - Change `<your-path>` to your path to files.
 - Save file as: `RTL 102.5 Playlist.desktop`
-- Make your file executable: open properties or run `chmod +x "RTL 102.5 Playlist.desktop"`
-- Double click on your file (terminal wil be shown) and listen.
+- Make your file executable: open properties or run `chmod +x RTL\ 102.5\ Playlist.desktop`
+- Add application launcher to `/usr/share/applications/`: `sudo cp <your-path>/rtl102.5-playlist/RTL\ 102.5\ Playlist.desktop /usr/share/applications/`
+- Double click on your file and listen.
+
+![screen 1](images/screen1.png)
+
+![screen 2](images/screen2.png)
+
+Application have 5 seconds lag on turning on and 5-10 seconds lag on turning off.
 
 ## How to use (v. 1)
 * Run stream `http://shoutcast.rtl.it:3010/stream/1/` using VLC.
