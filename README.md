@@ -16,7 +16,7 @@ Create application launcher:
     Exec=python <your-path>/rtl102.5-playlist/Main.py
     Name=RTL 102.5 Playlist
     Comment=RTL 102.5 plugin
-    Icon=<your-path>/rtl102.5-playlist/icon.png
+    Icon=<your-path>/rtl102.5-playlist/images/icon.png
     ```
 - Change `<your-path>` to your path to files.
 - Save file as: `RTL 102.5 Playlist.desktop`
