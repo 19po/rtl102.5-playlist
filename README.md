@@ -30,6 +30,10 @@ Create application launcher:
 
 Application have 5 seconds lag on turning on and 5-10 seconds lag on turning off.
 
+Application is under Python 2.7 and Qt4.
+Make sure you have installed sni-qt and enabled http interaface in VLC:
+run VLC, open properties (Ctrl+P), show full properties, go to Interface -> Main Interfaces and enable web in interface modules.
+
 ## How to use (v. 1)
 * Run stream `http://shoutcast.rtl.it:3010/stream/1/` using VLC.
 * Open terminal and run `python rtl1025-playlist.py`.
