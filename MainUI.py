@@ -2,14 +2,14 @@ from PyQt4 import QtGui, QtCore, QtWebKit
 from Playlist import Playlist
 from SystemTray import SystemTray
 import icon
-from time import sleep
+import vlc
 
 __author__ = 'postrowski'
 
 # -*-coding: utf-8-*-
 
 
-class MainUI(QtGui.QMainWindow, Playlist):
+class MainUI(QtGui.QMainWindow):
     """
         Class MainUI which setup widgets and events.
     """
@@ -26,23 +26,30 @@ class MainUI(QtGui.QMainWindow, Playlist):
         self.logoLabel = QtGui.QLabel()
         self.tray_menu = QtGui.QMenu()
         self.tray_icon = QtGui.QSystemTrayIcon()
-        self.process_vlc = QtCore.QProcess()
-
-        # setup UI
-        self.setup_ui()
-
-        # self.timer.timeout.connect(self.json_change)
-        self.connect(self.timer, QtCore.SIGNAL("timeout()"), self.json_change)
-
-        # hide message after double click on it
-        self.signalDoubleClick.connect(self.hide)
 
         # remove file
-        p = Playlist(self)
-        p.remove_file()
+        self.p = Playlist(self)
+        self.p.remove_file()
+
+        # hide message after double click on it
+        self.connect(self, QtCore.SIGNAL("signalDoubleClick()"), self.hide)
+
+        # creating a vlc instance
+        options = '--extraintf=http --network-caching=3000'  # enable web interface; network delay 3s
+        self.instance = vlc.Instance(options)
+        # creating an empty vlc media player
+        self.media_player = self.instance.media_player_new()
+        # create the media
+        filename = 'http://shoutcast.rtl.it:3010/stream/1/'
+        self.media = self.instance.media_new(filename)
+        # put the media in the media player
+        self.media_player.set_media(self.media)
 
         # System Tray Icon
         SystemTray(self)
+
+        # setup UI
+        self.setup_ui()
 
     def setup_ui(self):
         """
@@ -69,7 +76,7 @@ class MainUI(QtGui.QMainWindow, Playlist):
         self.programWebView.page().mainFrame().setScrollBarPolicy(QtCore.Qt.Vertical, QtCore.Qt.ScrollBarAlwaysOff)
         self.programWebView.hide()
 
-        self.timer.start(30)  # timer initial state
+        self.timer.start(10)  # timer initial state
 
         pixmap = QtGui.QPixmap(":/images/icon.png")
         self.logoLabel.setPixmap(pixmap)
@@ -81,8 +88,8 @@ class MainUI(QtGui.QMainWindow, Playlist):
         # layout
 
         self.central_widget.setStyleSheet(
-            ".QWidget { background-color: rgba(30, 30, 30, 90%); border-style: solid; border-radius: 12px} \
-            QWidget:hover { background-color: rgba(30, 30, 30, 70%)}")
+            ".QWidget { background-color: rgba(30, 30, 30, 90%); border-style: solid; border-radius: 20px; border-width: 20 } \
+            QWidget:hover { background-color: rgba(30, 30, 30, 70%) }")
         self.central_widget.setToolTip("Double click to hide")
         self.central_widget.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         self.central_widget.hide()
@@ -103,9 +110,6 @@ class MainUI(QtGui.QMainWindow, Playlist):
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.SplashScreen)
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         self.setGeometry(self.width() * 2, self.height() / 2 - 150, 400, 150)
-
-        self.process_vlc.start("cvlc --extraintf=http http://shoutcast.rtl.it:3010/stream/1/")
-        sleep(5)  # wait 5 seconds (time needed to start cVLC)
 
     def mouseDoubleClickEvent(self, event):
         """
@@ -128,3 +132,11 @@ class MainUI(QtGui.QMainWindow, Playlist):
         :return: None
         """
         self.show()
+
+    def start_info(self):
+        self.connect(self.timer, QtCore.SIGNAL("timeout()"), self.p.json_change)
+
+    def stop_info(self):
+        self.timer.killTimer(10)
+        self.disconnect(self.timer, QtCore.SIGNAL("timeout()"), self.p.json_change)
+        self.p.remove_file()

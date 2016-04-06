@@ -21,11 +21,8 @@ class Playlist(object):
         self.coverWebView = parent.coverWebView
         self.programWebView = parent.programWebView
         self.timer = parent.timer
-        self.width = parent.width
-        self.height = parent.height
         self.central_widget = parent.central_widget
         self.hide_ui = parent.hide_ui
-        self.show_ui = parent.show_ui
         self.logoLabel = parent.logoLabel
 
     def show_info(self, data):
@@ -76,15 +73,13 @@ class Playlist(object):
 
     def show_msg(self):
         """
-            Check Internet connection. Resize central widget. Show UI per 20 seconds.
+            Resize central widget. Show UI per 20 seconds.
         :return: None
         """
         with open('/tmp/rtl1025-playlist-2.json', 'r') as f:
             data = json.load(f)
 
         self.show_info(data)
-        self.show_ui()
-        self.central_widget.show()
 
         # resize central widget; not smaller than fixed size
         size = self.central_widget.size()
@@ -116,18 +111,15 @@ class Playlist(object):
 
     def json_change(self):
         """
-            Check is  information from VLC status.xml file and compare them.
+            Get information from VLC status.xml file and compare them.
         :return: None
         """
-        self.hide_ui()
-
         if os.path.exists('/tmp/rtl1025-playlist-2.json'):
-            # get current information (1) and make json file
+            # get current information and make json file
             print "1111"
             write_info_1()  # create 'rtl1025-playlist-1.json' file
             sleep(10)  # wait 10 seconds
             write_info_2()  # create 'rtl1025-playlist-2.json' file
-            # compare two previous created json
             self.cmp_json('/tmp/rtl1025-playlist-1.json', '/tmp/rtl1025-playlist-2.json')
         else:
             print "0000"
