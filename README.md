@@ -30,6 +30,7 @@ Create application launcher:
 
 Application is under Python 2.7 and Qt4.
 Make sure you have installed sni-qt.
+Now (07.04.2016) radio doesn't streaming any data, so app has no data.
 
 ## How to use (v. 1)
 * Run stream `http://shoutcast.rtl.it:3010/stream/1/` using VLC.

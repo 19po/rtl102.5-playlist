@@ -133,6 +133,10 @@ class MainUI(QtGui.QMainWindow):
         """
         self.show()
 
+    def hide_all(self):
+        self.hide_ui()
+        self.central_widget.hide()
+
     def start_info(self):
         self.connect(self.timer, QtCore.SIGNAL("timeout()"), self.p.json_change)
 

@@ -1,6 +1,5 @@
 from PyQt4 import QtGui, QtCore
 import sys
-# from time import sleep
 
 __author__ = 'postrowski'
 
@@ -25,6 +24,7 @@ class SystemTray(QtGui.QSystemTrayIcon):
         self.hide_ui = parent.hide_ui
         self.show_ui = parent.show_ui
         self.central_widget = parent.central_widget
+        self.hide_all = parent.hide_all
 
         self.setup_menu()
 
@@ -35,9 +35,9 @@ class SystemTray(QtGui.QSystemTrayIcon):
         """
         # menu
 
-        self.msg_action = QtGui.QAction("Show", self.tray_menu)
-        self.connect(self.msg_action, QtCore.SIGNAL("triggered()"), self.msg)
-        self.tray_menu.addAction(self.msg_action)
+        self.show_action = QtGui.QAction("Show", self.tray_menu)
+        self.connect(self.show_action, QtCore.SIGNAL("triggered()"), self.show_all)
+        self.tray_menu.addAction(self.show_action)
 
         self.play_pause_action = QtGui.QAction("Play", self.tray_menu)
         self.connect(self.play_pause_action, QtCore.SIGNAL("triggered()"), self.play_pause)
@@ -53,7 +53,8 @@ class SystemTray(QtGui.QSystemTrayIcon):
         self.tray_icon.setContextMenu(self.tray_menu)
         self.tray_icon.show()
 
-    def msg(self):
+    def show_all(self):
+        print "show"
         self.show_ui()
         self.central_widget.show()
 
@@ -67,16 +68,13 @@ class SystemTray(QtGui.QSystemTrayIcon):
             self.media_player.pause()
             self.play_pause_action.setText("Play")
             self.stop_info()
-            self.hide_ui()
-            self.central_widget.hide()
+            self.hide_all()
         else:
             print "play"
             self.media_player.play()
             self.play_pause_action.setText("Pause")
-            # sleep(5)
             self.start_info()
-            self.show_ui()
-            self.central_widget.show()
+            self.show_all()
 
     @staticmethod
     def quit_app():

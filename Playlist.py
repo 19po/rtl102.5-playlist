@@ -23,6 +23,8 @@ class Playlist(object):
         self.timer = parent.timer
         self.central_widget = parent.central_widget
         self.hide_ui = parent.hide_ui
+        self.show_ui = parent.show_ui
+        self.hide_all = parent.hide_all
         self.logoLabel = parent.logoLabel
 
     def show_info(self, data):
@@ -68,8 +70,8 @@ class Playlist(object):
         else:
             self.programWebView.hide()
 
-        for k, v in data.items():
-            print("{:15}{:2}{:1}".format(k, ":", v.encode('utf-8')))
+        # for k, v in data.items():
+        #     print("{:15}{:2}{:1}".format(k, ":", v.encode('utf-8')))
 
     def show_msg(self):
         """
@@ -89,7 +91,8 @@ class Playlist(object):
         elif size > self.central_widget.resize(new_size):
             self.central_widget.resize(size)
 
-        self.timer.start(20000)  # 20 seconds, display UI time in ms
+        self.timer.start(8000)  # 8 seconds, display UI time in ms
+        self.timer.timeout.connect(self.hide_all)
 
     def cmp_json(self, j1, j2):
         """
@@ -114,13 +117,20 @@ class Playlist(object):
             Get information from VLC status.xml file and compare them.
         :return: None
         """
-        if os.path.exists('/tmp/rtl1025-playlist-2.json'):
-            # get current information and make json file
-            print "1111"
-            write_info_1()  # create 'rtl1025-playlist-1.json' file
-            sleep(10)  # wait 10 seconds
-            write_info_2()  # create 'rtl1025-playlist-2.json' file
-            self.cmp_json('/tmp/rtl1025-playlist-1.json', '/tmp/rtl1025-playlist-2.json')
+        if os.path.exists('/tmp/rtl1025-playlist-2.json'):  # check if path exist
+            with open('/tmp/rtl1025-playlist-2.json', 'r') as fr:
+                d = json.load(fr)
+                if d["program_title"]:  # check if dictionary item have value
+                    # get current information and make json file
+                    print "1111"
+                    write_info_1()  # create 'rtl1025-playlist-1.json' file
+                    sleep(10)  # wait 10 seconds
+                    write_info_2()  # create 'rtl1025-playlist-2.json' file
+                    self.cmp_json('/tmp/rtl1025-playlist-1.json', '/tmp/rtl1025-playlist-2.json')
+                    return
+                else:
+                    print "empty"
+                    return
         else:
             print "0000"
             write_info_2()  # create 'rtl1025-playlist-2.json' file
