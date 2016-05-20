@@ -77,7 +77,7 @@ def get_info():
 		except (IndexError, AttributeError):
 			pass
 	
-		# save as json file
+		# my_dict as json file
 		fw.write(json.dumps(info_dict))	
 	
 	# display data

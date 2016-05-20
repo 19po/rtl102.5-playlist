@@ -2130,8 +2130,8 @@ class Media(_Ctype):
 
     
     def set_meta(self, e_meta, psz_value):
-        '''Set the meta of the media (this function will not save the meta, call
-        L{save_meta} in order to save the meta).
+        '''Set the meta of the media (this function will not my_dict the meta, call
+        L{save_meta} in order to my_dict the meta).
         @param e_meta: the meta to write.
         @param psz_value: the media's meta.
         '''
@@ -3486,7 +3486,7 @@ class MediaPlayer(_Ctype):
         If i_width AND i_height is 0, original size is used.
         If i_width XOR i_height is 0, original aspect-ratio is preserved.
         @param num: number of video output (typically 0 for the first/only one).
-        @param psz_filepath: the path where to save the screenshot to.
+        @param psz_filepath: the path where to my_dict the screenshot to.
         @param i_width: the snapshot's width.
         @param i_height: the snapshot's height.
         @return: 0 on success, -1 if the video was not found.
@@ -4280,8 +4280,8 @@ def libvlc_media_get_meta(p_md, e_meta):
     return f(p_md, e_meta)
 
 def libvlc_media_set_meta(p_md, e_meta, psz_value):
-    '''Set the meta of the media (this function will not save the meta, call
-    L{libvlc_media_save_meta} in order to save the meta).
+    '''Set the meta of the media (this function will not my_dict the meta, call
+    L{libvlc_media_save_meta} in order to my_dict the meta).
     @param p_md: the media descriptor.
     @param e_meta: the meta to write.
     @param psz_value: the media's meta.
@@ -6006,7 +6006,7 @@ def libvlc_video_take_snapshot(p_mi, num, psz_filepath, i_width, i_height):
     If i_width XOR i_height is 0, original aspect-ratio is preserved.
     @param p_mi: media player instance.
     @param num: number of video output (typically 0 for the first/only one).
-    @param psz_filepath: the path where to save the screenshot to.
+    @param psz_filepath: the path where to my_dict the screenshot to.
     @param i_width: the snapshot's width.
     @param i_height: the snapshot's height.
     @return: 0 on success, -1 if the video was not found.

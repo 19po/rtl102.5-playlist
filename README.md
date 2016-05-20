@@ -14,14 +14,14 @@ Create application launcher:
     Type=Application
     Terminal=false
     Exec=python <your-path>/rtl102.5-playlist/Main.py
-    Name=RTL 102.5 Playlist
+    Name=RTL 102.5 Player
     Comment=RTL 102.5 plugin
     Icon=<your-path>/rtl102.5-playlist/images/icon.png
     ```
 - Change `<your-path>` to your path to files.
-- Save file as: `RTL 102.5 Playlist.desktop`
-- Make your file executable: open properties or run `chmod +x RTL\ 102.5\ Playlist.desktop`
-- Add application launcher to `/usr/share/applications/`: `sudo cp <your-path>/rtl102.5-playlist/RTL\ 102.5\ Playlist.desktop /usr/share/applications/`
+- Save file as: `RTL 102.5 Player.desktop`
+- Make your file executable: open properties or run `chmod +x RTL\ 102.5\ Player.desktop`
+- Add application launcher to `/usr/share/applications/` or run `sudo cp <your-path>/rtl102.5-playlist/RTL\ 102.5\ Player.desktop /usr/share/applications/`
 - Double click on your file and listen.
 
 ![screen 1](images/screen1.png)
@@ -30,7 +30,6 @@ Create application launcher:
 
 Application is under Python 2.7 and Qt4.
 Make sure you have installed sni-qt.
-Now (07.04.2016) radio doesn't streaming any data, so app has no data.
 
 ## How to use (v. 1)
 * Run stream `http://shoutcast.rtl.it:3010/stream/1/` using VLC.

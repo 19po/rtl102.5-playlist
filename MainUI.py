@@ -1,8 +1,6 @@
 from PyQt4 import QtGui, QtCore, QtWebKit
-from Playlist import Playlist
 from SystemTray import SystemTray
 import icon
-import vlc
 
 __author__ = 'postrowski'
 
@@ -13,12 +11,14 @@ class MainUI(QtGui.QMainWindow):
     """
         Class MainUI which setup widgets and events.
     """
+
     signalDoubleClick = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
+
         super(MainUI, self).__init__(parent)
         self.central_widget = QtGui.QWidget()
-        self.timer = QtCore.QTimer()
+        self.timer_show = QtCore.QTimer()
         self.programWebView = QtWebKit.QWebView()
         self.coverWebView = QtWebKit.QWebView()
         self.programLabel = QtGui.QLabel()
@@ -27,23 +27,8 @@ class MainUI(QtGui.QMainWindow):
         self.tray_menu = QtGui.QMenu()
         self.tray_icon = QtGui.QSystemTrayIcon()
 
-        # remove file
-        self.p = Playlist(self)
-        self.p.remove_file()
-
         # hide message after double click on it
         self.connect(self, QtCore.SIGNAL("signalDoubleClick()"), self.hide)
-
-        # creating a vlc instance
-        options = '--extraintf=http --network-caching=3000'  # enable web interface; network delay 3s
-        self.instance = vlc.Instance(options)
-        # creating an empty vlc media player
-        self.media_player = self.instance.media_player_new()
-        # create the media
-        filename = 'http://shoutcast.rtl.it:3010/stream/1/'
-        self.media = self.instance.media_new(filename)
-        # put the media in the media player
-        self.media_player.set_media(self.media)
 
         # System Tray Icon
         SystemTray(self)
@@ -56,6 +41,7 @@ class MainUI(QtGui.QMainWindow):
             Setup user interface (UI) widgets.
         :return: None
         """
+
         self.nowPlayingLabel.setStyleSheet("QLabel {color : white; background-color: None}")
         self.nowPlayingLabel.hide()
 
@@ -76,7 +62,7 @@ class MainUI(QtGui.QMainWindow):
         self.programWebView.page().mainFrame().setScrollBarPolicy(QtCore.Qt.Vertical, QtCore.Qt.ScrollBarAlwaysOff)
         self.programWebView.hide()
 
-        self.timer.start(10)  # timer initial state
+        self.timer_show.start(100)  # timer_show initial state
 
         pixmap = QtGui.QPixmap(":/images/icon.png")
         self.logoLabel.setPixmap(pixmap)
@@ -103,13 +89,14 @@ class MainUI(QtGui.QMainWindow):
         grid.addWidget(self.programLabel, 2, 3, 1, 1, QtCore.Qt.AlignCenter)
         self.central_widget.setLayout(grid)
         grid.setAlignment(self, QtCore.Qt.AlignRight)
+        grid.setContentsMargins(20, 20, 20, 20)
 
         self.setCentralWidget(self.central_widget)
         self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.SplashScreen)
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
-        self.setGeometry(self.width() * 2, self.height() / 2 - 150, 400, 150)
+        self.setGeometry(self.width() * 2, self.height() / 2 - 150, 500, 170)
 
     def mouseDoubleClickEvent(self, event):
         """
@@ -117,6 +104,7 @@ class MainUI(QtGui.QMainWindow):
         :param event: event
         :return: None
         """
+
         self.signalDoubleClick.emit()
 
     def hide_ui(self):
@@ -124,6 +112,7 @@ class MainUI(QtGui.QMainWindow):
             Hide UI.
         :return: None
         """
+
         self.hide()
 
     def show_ui(self):
@@ -131,16 +120,5 @@ class MainUI(QtGui.QMainWindow):
             Show UI.
         :return: None
         """
+
         self.show()
-
-    def hide_all(self):
-        self.hide_ui()
-        self.central_widget.hide()
-
-    def start_info(self):
-        self.connect(self.timer, QtCore.SIGNAL("timeout()"), self.p.json_change)
-
-    def stop_info(self):
-        self.timer.killTimer(10)
-        self.disconnect(self.timer, QtCore.SIGNAL("timeout()"), self.p.json_change)
-        self.p.remove_file()
