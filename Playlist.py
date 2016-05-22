@@ -40,17 +40,17 @@ class Playlist(object):
             return False
 
         info_dict = {"program_title": "", "speakers": "", "program_image": "",
-                     "song_title": "", "album_name": "", "artist_name": "", "album_cover": ""}
+                     "song_title": "", "album_title": "", "artist_name": "", "album_cover": ""}
 
         try:
-            info_dict["program_title"] = uni(node[0].getElementsByTagName('prg_title')[0].firstChild.data)
-            info_dict["speakers"] = uni(node[0].getElementsByTagName('speakers')[0].firstChild.data)
-            info_dict["program_image"] = node[0].getElementsByTagName('image170')[0].firstChild.data
+            info_dict["program_title"] = uni(node[0].getElementsByTagName("prg_title")[0].firstChild.data)
+            info_dict["speakers"] = uni(node[0].getElementsByTagName("speakers")[0].firstChild.data)
+            info_dict["program_image"] = node[0].getElementsByTagName("image170")[0].firstChild.data
 
-            info_dict["song_title"] = uni(node[0].getElementsByTagName('mus_sng_title')[0].firstChild.data)
-            info_dict["artist_name"] = uni(node[0].getElementsByTagName('mus_art_name')[0].firstChild.data)
-            info_dict["album_name"] = uni(node[0].getElementsByTagName('mus_sng_itunesalbumname')[0].firstChild.data)
-            info_dict["album_cover"] = node[0].getElementsByTagName('mus_sng_itunescoverbig')[0].firstChild.data
+            info_dict["song_title"] = uni(node[0].getElementsByTagName("mus_sng_title")[0].firstChild.data)
+            info_dict["artist_name"] = uni(node[0].getElementsByTagName("mus_art_name")[0].firstChild.data)
+            info_dict["album_title"] = uni(node[0].getElementsByTagName("mus_sng_itunesalbumname")[0].firstChild.data)
+            info_dict["album_cover"] = node[0].getElementsByTagName("mus_sng_itunescoverbig")[0].firstChild.data
         except (IndexError, AttributeError):
             pass
         # print "info dict: ", info_dict
@@ -141,19 +141,19 @@ def uni(s):
     """
 
     # find and replace number to ascii character
-    ascii_char = re.findall(r'\[e\]\[c\](\d+)\[p\]', s)
+    ascii_char = re.findall(r"\[e\]\[c\](\d+)\[p\]", s)
     for char in ascii_char:
         if char in s:
             s = s.replace(char, unichr(int(char)))
 
     # find and remove [*]
-    other_char = re.findall(r'\[[a-z]\]+', s)
+    other_char = re.findall(r"\[[a-z]\]+", s)
     for char in other_char:
         if char in s:
-            s = s.replace(char, '')
+            s = s.replace(char, "")
 
     # find and replace html characters with unicode characters
-    html_chars = {'&': ' amp ', '"': ' quot ', "'": ' apos ', '>': ' gt ', '<': ' lt '}
+    html_chars = {" & ": " amp ", " \" ": " quot ", " ' ": " apos ", " > ": " gt ", " < ": " lt "}
     for k, v in html_chars.items():
         if v in s:
             s = s.replace(v, k)

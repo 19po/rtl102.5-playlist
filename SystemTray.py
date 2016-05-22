@@ -3,11 +3,8 @@ import sys
 from Playlist import Playlist
 import vlc
 import urllib
-import os
-import re
 
 __author__ = 'postrowski'
-
 
 # -*-coding: utf-8-*-
 
@@ -74,7 +71,7 @@ class SystemTray(QtGui.QSystemTrayIcon):
         self.save_cover_action = QtGui.QAction("Save album cover", self.tray_menu)
         self.connect(self.save_cover_action, QtCore.SIGNAL("triggered()"),
                      lambda: self.save_picture(self.my_dict["album_cover"],
-                                               self.my_dict[u"artist_name"] + " - " + self.my_dict[u"album_name"]))
+                                               self.my_dict[u"artist_name"] + " - " + self.my_dict[u"album_title"]))
         self.tray_menu.addAction(self.save_cover_action)
         self.save_cover_action.setVisible(False)
 
@@ -138,7 +135,7 @@ class SystemTray(QtGui.QSystemTrayIcon):
                     self.save_cover_action.setVisible(False)
             except TypeError:  # parse data delay when play button pressed
                 pass
-            
+
             try:
                 if self.my_dict["program_image"]:
                     self.save_image_action.setVisible(True)
@@ -154,7 +151,7 @@ class SystemTray(QtGui.QSystemTrayIcon):
         """
 
         if self.player.is_playing():
-            print "paused"
+            # print "paused"
             self.timer_show.killTimer(10)
             self.timer_check.stop()
             self.play_pause_action.setText("Paused")
@@ -162,7 +159,7 @@ class SystemTray(QtGui.QSystemTrayIcon):
             self.hide_all()
             self.stop_action.setVisible(True)
         else:
-            print "play"
+            # print "play"
             self.timer_check.start(1000)
             self.play_pause_action.setText("Pause")
             self.player.play()
@@ -175,7 +172,8 @@ class SystemTray(QtGui.QSystemTrayIcon):
             Stop stream.
         :return: None
         """
-        print "stop"
+
+        # print "stop"
         self.player.stop()
         self.play_pause_action.setText("Play")
         self.stop_action.setVisible(False)
@@ -184,40 +182,21 @@ class SystemTray(QtGui.QSystemTrayIcon):
         self.hide_all()
 
     @staticmethod
-    def save_picture(url, filename):
+    def save_picture(url, file_name):
         """
-            Save picture with next number.
+            Save album cover and/or program image.
         :param url: file url
-        :param filename: file name
+        :param file_name: file name
         :return: None
         """
-        if os.path.exists("saved/" + filename + ' (1)'):
 
-            # make list of files in "saved/" directory
-            file_list = []
-            [file_list.append(f) for f in os.listdir("saved/")]
+        location = QtGui.QFileDialog()
+        dir_path = QtCore.QDir()
+        path = dir_path.homePath() + dir_path.separator() + unicode(file_name)
+        file_path = location.getSaveFileName(location, "Save file as", path)
 
-            file_list = [i.decode("utf-8") for i in file_list]  # decode to utf-8
-            name = escape_chars(filename)
-
-            # get all file names with given numbers
-            same = [x for i in file_list for x in re.findall(u'({0} \\(\d+\\))'.format(name), i) if x]
-
-            # get max number
-            max_it = max([m for i in same for m in re.findall('(\d+)', i) if m])
-
-            # save as 'filename (max_it + 1)'
-            urllib.urlretrieve(url, "saved/" + unicode(filename) + " (" + unicode(int(max_it) + 1) + ")")
-
-        elif os.path.exists("saved/" + filename):
-
-            # save as 'filename (1)'
-            urllib.urlretrieve(url, "saved/" + filename + ' (1)')
-
-        else:
-
-            # save as 'filename'
-            urllib.urlretrieve(url, "saved/" + filename)
+        if location:
+            urllib.urlretrieve(url, unicode(file_path))
 
     @staticmethod
     def quit_app():
@@ -226,20 +205,5 @@ class SystemTray(QtGui.QSystemTrayIcon):
         :return: None
         """
 
-        print "quit"
+        # print "quit"
         sys.exit()
-
-
-def escape_chars(s):
-    """
-        Escape characters in string.
-    :param s: string
-    :return: string
-    """
-
-    chars = ('(', ')', '\', ''', '"')
-
-    for char in chars:
-        if char in s:
-            s = s.replace(char, '\\' + char)
-    return s

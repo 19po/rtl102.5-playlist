@@ -1,35 +1,43 @@
 # rtl102.5-playlist
-RTL 102.5 (private Italian radio station) on-the-air playlist parser for VLC.
-Radio's website: www.rtl.it, and Wikipedia entry: https://en.wikipedia.org/wiki/RTL_102.5
+RTL 102.5 (private Italian radio station) on-the-air radio stream information parser for VLC.
+Radio's website: www.rtl.it, and Wikipedia entry: https://en.wikipedia.org/wiki/RTL_102.5.
 
 ## How to use (v. 2)
-Create application launcher:
+Create application launcher (like here: https://help.ubuntu.com/community/UnityLaunchersAndDesktopFiles):
 
 - Open gedit and paste as below.
 
     ```
     #!/usr/bin/env xdg-open
-    [Desktop Entry]
-    Version=2.0
-    Type=Application
-    Terminal=false
-    Exec=python <your-path>/rtl102.5-playlist/Main.py
-    Name=RTL 102.5 Player
-    Comment=RTL 102.5 plugin
-    Icon=<your-path>/rtl102.5-playlist/images/icon.png
+
+	[Desktop Entry]
+	Version=1.0
+	Name=RTL 102.5 Player
+	Comment=Player for Italian radio station RTL 102.5
+	Exec=/<your-absolute-path>/rtl102.5-playlist/Main.py
+	Icon=/<your-absolute-path>/rtl102.5-playlist/images/icon.png
+	Terminal=false
+	Type=Application
     ```
-- Change `<your-path>` to your path to files.
-- Save file as: `RTL 102.5 Player.desktop`
-- Make your file executable: open properties or run `chmod +x RTL\ 102.5\ Player.desktop`
-- Add application launcher to `/usr/share/applications/` or run `sudo cp <your-path>/rtl102.5-playlist/RTL\ 102.5\ Player.desktop /usr/share/applications/`
-- Double click on your file and listen.
+
+- Save as: 
+	`RTL 102.5 Player.desktop`
+- validate desktop file:
+	`desktop-file-validate <your-path>/rtl102.5-playlist/RTL\ 102.5\ Player.desktop`
+- install desktop file in `/usr/share/applications/` location:
+	`sudo desktop-file-install <your-path>/rtl102.5-playlist/RTL\ 102.5\ Player.desktop`
+- Make files executable:
+	`sudo chmod +x <your-path>/rtl102.5-playlist/Main.py`
+	`sudo chmod +x /usr/share/applications/RTL\ 102.5\ Player.desktop`
+
+Screenshot:
 
 ![screen 1](images/screen1.png)
 
 ![screen 2](images/screen2.png)
 
 Application is under Python 2.7 and Qt4.
-Make sure you have installed sni-qt.
+Make sure you have installed sni-qt and VLC.
 
 ## How to use (v. 1)
 * Run stream `http://shoutcast.rtl.it:3010/stream/1/` using VLC.
