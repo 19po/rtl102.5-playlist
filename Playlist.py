@@ -5,6 +5,7 @@ from xml.parsers.expat import ExpatError
 
 __author__ = 'postrowski'
 
+
 # -*-coding: utf-8-*-
 
 
@@ -24,6 +25,8 @@ class Playlist(object):
         self.central_widget = parent.central_widget
         self.hide_ui = parent.hide_ui
         self.show_ui = parent.show_ui
+        # self.central_widget_width = parent.central_widget_width
+        # self.central_widget_height = parent.central_widget_height
 
     @staticmethod
     def xml_to_dict(xml_data):
@@ -111,9 +114,10 @@ class Playlist(object):
 
         self.hide_ui()
         self.central_widget.hide()
+        #  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
     def show_msg(self):
-        """
+        """                                         #  ddddddddddddddddddddddddddddddddddddddffgddd
             Resize central widget. Show UI for 10 seconds, then hide it.
         :return: None
         """
@@ -122,12 +126,31 @@ class Playlist(object):
         self.central_widget.show()
 
         # resize central widget; not smaller than fixed size
-        size = self.central_widget.size()
-        new_size = self.central_widget.sizeHint()
-        if size < self.central_widget.resize(new_size):
-            self.central_widget.resize(new_size)
-        elif size > self.central_widget.resize(new_size):
-            self.central_widget.resize(size)
+        # size = self.central_widget.size()
+        # new_size = self.central_widget.sizeHint()
+        # print size, new_size
+        # print "++", self.central_widget.size()
+        # self.central_widget.sizeHint()
+        # self.central_widget.updateGeometry()  # recalculate size
+        # print "**", self.central_widget.size()
+
+
+        # if size.width() > new_size.width() >= 500:
+        #     self.central_widget.resize(new_size)
+        #     self.central_widget.updateGeometry()  # recalculate size
+        #     print "1"
+        # elif new_size.width() < size.width() and new_size.width() <= 500:
+        #     self.central_widget.resize(500, 170)
+        #     self.central_widget.updateGeometry()  # recalculate size
+        #     print "2"
+        # elif new_size.width() > size.width() and new_size.width() >= 500:
+        #     self.central_widget.resize(new_size)
+        #     self.central_widget.updateGeometry()  # recalculate size
+        #     print "3"
+        # elif size.width() < new_size.width() <= 500:
+        #     self.central_widget.resize(500, 170)
+        #     self.central_widget.updateGeometry()  # recalculate size
+        #     print "4"
 
         self.timer_show.start(10000)  # 10 seconds, display UI time in ms
         self.timer_show.timeout.connect(self.hide_all)
@@ -141,21 +164,24 @@ def uni(s):
     """
 
     # find and replace number to ascii character
-    ascii_char = re.findall(r"\[e\]\[c\](\d+)\[p\]", s)
+    # find: [e][c]100[p], 100
+    # replace: [e][c]100[p] -> d
+
+    ascii_char = re.findall(r"(\[e\]\[c\](\d+)\[p\])", s)
+
     for char in ascii_char:
-        if char in s:
-            s = s.replace(char, unichr(int(char)))
+        s = s.replace(char[0], unichr(int(char[1])))
 
-    # find and remove [*]
-    other_char = re.findall(r"\[[a-z]\]+", s)
-    for char in other_char:
-        if char in s:
-            s = s.replace(char, "")
+    # find and replace html character with unicode character
+    # find: [e]amp[p], amp
 
-    # find and replace html characters with unicode characters
-    html_chars = {" & ": " amp ", " \" ": " quot ", " ' ": " apos ", " > ": " gt ", " < ": " lt "}
-    for k, v in html_chars.items():
-        if v in s:
-            s = s.replace(v, k)
+    html_char = re.findall(r"(\[e\]([a-z]+)\[p\])", s)
+    chars = {"&": "amp", "\"": "quot", "'": "apos", ">": "gt", "<": "lt"}
+
+    for char in html_char:
+        for k, v in chars.items():
+            if v in char[1]:
+                s = s.replace(char[0], k)
 
     return s
+
